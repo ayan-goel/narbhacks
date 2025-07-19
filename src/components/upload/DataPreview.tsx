@@ -84,7 +84,7 @@ export default function DataPreview({ data, onConfirm, onCancel }: DataPreviewPr
           <strong>Processing Time:</strong> {data.estimatedProcessingTime}
         </p>
         <p className="text-xs text-yellow-700 mt-1">
-          We'll analyze your conversations, extract topics, and generate your wrapped cards.
+          We&apos;ll analyze your conversations, extract topics, and generate your wrapped cards.
         </p>
       </div>
 
