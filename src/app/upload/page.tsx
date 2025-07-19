@@ -423,7 +423,7 @@ export default function UploadPage() {
             Upload Your ChatGPT Data
           </h2>
           <p className="text-xl text-gray-600">
-            Let's analyze your conversations and create your wrapped
+            Let&apos;s analyze your conversations and create your wrapped
           </p>
         </div>
         )}

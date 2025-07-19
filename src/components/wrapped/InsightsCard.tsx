@@ -62,7 +62,7 @@ export default function InsightsCard({ data, year, index }: InsightsCardProps) {
       <div className="text-center">
         <div className="bg-white/10 rounded-lg p-3 mb-4">
           <p className="text-white/80 text-sm italic">
-            "Every conversation was a step in your AI journey"
+            &quot;Every conversation was a step in your AI journey&quot;
           </p>
         </div>
         

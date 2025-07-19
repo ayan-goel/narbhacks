@@ -106,7 +106,7 @@ export default function QuestionMasterCard({ data, year, index }: QuestionMaster
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
               <Search className="h-6 w-6 mx-auto mb-2 text-white/80" />
               <div className="text-white font-semibold text-sm">
-                "{data.topQuestionWord}"
+                &quot;{data.topQuestionWord}&quot;
               </div>
               <div className="text-white/70 text-xs">
                 your favorite question word

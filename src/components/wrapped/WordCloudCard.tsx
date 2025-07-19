@@ -121,7 +121,7 @@ export default function WordCloudCard({ data, year, index }: WordCloudCardProps)
         >
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
             <div className="text-2xl font-bold text-white mb-1">
-              "{data.mostUsedWord}"
+              &quot;{data.mostUsedWord}&quot;
             </div>
             <div className="text-white/80 text-sm">your signature word</div>
           </div>

@@ -128,7 +128,7 @@ export default function SentimentCard({ data, year, index }: SentimentCardProps)
         <div className="mt-6">
           <div className="bg-white/10 rounded-lg p-3">
             <p className="text-white/90 text-sm italic text-center">
-              "Your conversations show a balanced emotional journey through AI exploration"
+              &quot;Your conversations show a balanced emotional journey through AI exploration&quot;
             </p>
           </div>
         </div>

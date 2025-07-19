@@ -21,12 +21,8 @@ export default function DataPreview({ data, onConfirm, onCancel }: DataPreviewPr
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Data Preview
-        </h2>
-        <p className="text-gray-600">
-          Here's what we found in your ChatGPT export
-        </p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">You&apos;re about to upload:</h2>
+        <p className="text-sm text-gray-600">This is an estimate. It&apos;s usually faster!</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">

@@ -57,20 +57,9 @@ export default function Features() {
             </span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-            <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-blue-900 bg-clip-text text-transparent">
-              Everything you need to
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              understand your AI journey
-            </span>
-          </h2>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">It&apos;s simple to get started</h2>
           
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            From simple uploads to beautiful insights, we've got everything covered 
-            to make your ChatGPT data come alive.
-          </p>
+          <p className="mt-6 text-lg leading-8 text-gray-600">You&apos;re just a few clicks away from unlocking a new perspective on your AI conversations. Discover your patterns, favorite topics, and more.</p>
         </div>
 
         {/* Features Grid */}

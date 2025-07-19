@@ -224,10 +224,10 @@ export default function NumbersCard({ data, year, index }: NumbersCardProps) {
       >
         <div className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 backdrop-blur-sm rounded-2xl p-4">
           <div className="text-white/90 text-sm mb-1">
-            🏆 That's impressive!
+            That&apos;s impressive!
           </div>
           <div className="text-white font-semibold">
-            You're clearly an AI power user
+            You&apos;re clearly an AI power user
           </div>
         </div>
       </motion.div>
