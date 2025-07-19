@@ -85,7 +85,7 @@ export default function WordCloudCard({ data, year, index }: WordCloudCardProps)
         {/* Word Cloud */}
         <div className="relative h-40 bg-white/5 rounded-2xl overflow-hidden">
           <div className="absolute inset-0 p-4">
-            {wordElements.slice(0, 12).map((wordItem, idx) => (
+            {wordElements.slice(0, 24).map((wordItem) => (
               <motion.div
                 key={wordItem.word}
                 initial={{ opacity: 0, scale: 0 }}

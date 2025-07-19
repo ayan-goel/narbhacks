@@ -63,8 +63,8 @@ export default function UploadPage() {
     api.analyticsChunked.getStatsGenerationStatus,
     user?.id && (uploadState === "processing" || uploadState === "success")
       ? {
-          userId: user.id,
-          year: parsedData?.year ?? new Date().getFullYear(),
+    userId: user.id,
+    year: parsedData?.year ?? new Date().getFullYear(),
         }
       : "skip"
   );
@@ -410,7 +410,8 @@ export default function UploadPage() {
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-8 min-h-screen flex flex-col justify-start pt-20">
-        {/* Welcome Header */}
+        {/* Welcome Header - only for initial select state */}
+        {uploadState === 'select' && (
         <div className="text-center space-y-4">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-8">
             <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-indigo-600 bg-clip-text text-transparent">
@@ -425,6 +426,7 @@ export default function UploadPage() {
             Let's analyze your conversations and create your wrapped
           </p>
         </div>
+        )}
 
         {/* Upload Flow */}
         {uploadState === 'select' && (

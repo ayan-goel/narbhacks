@@ -2,13 +2,15 @@
 
 import WrappedCard from "./WrappedCard";
 import { motion } from "framer-motion";
-import { Sparkles, Calendar, MessageSquare } from "lucide-react";
+import { Sparkles, Calendar, MessageSquare, Hash, Clock } from "lucide-react";
 
 interface WelcomeCardProps {
   data: {
     year: number;
     totalConversations: number;
     totalMessages: number;
+    averageLength: number;
+    daysActive: number;
     greeting: string;
   };
   year: number;
@@ -75,6 +77,7 @@ export default function WelcomeCard({ data, year, index }: WelcomeCardProps) {
           className="space-y-4"
         >
           <div className="grid grid-cols-2 gap-4">
+            {/* Conversations */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
               <MessageSquare className="h-6 w-6 mx-auto mb-2 text-white/80" />
               <div className="text-2xl font-bold text-white">
@@ -82,13 +85,32 @@ export default function WelcomeCard({ data, year, index }: WelcomeCardProps) {
               </div>
               <div className="text-white/70 text-sm">conversations</div>
             </div>
-            
+
+            {/* Messages */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
-              <Calendar className="h-6 w-6 mx-auto mb-2 text-white/80" />
+              <Hash className="h-6 w-6 mx-auto mb-2 text-white/80" />
               <div className="text-2xl font-bold text-white">
                 {data.totalMessages.toLocaleString()}
               </div>
               <div className="text-white/70 text-sm">messages</div>
+            </div>
+
+            {/* Avg length */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
+              <Clock className="h-6 w-6 mx-auto mb-2 text-white/80" />
+              <div className="text-2xl font-bold text-white">
+                {data.averageLength}
+              </div>
+              <div className="text-white/70 text-sm">avg msgs / convo</div>
+            </div>
+
+            {/* Days active */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center">
+              <Calendar className="h-6 w-6 mx-auto mb-2 text-white/80" />
+              <div className="text-2xl font-bold text-white">
+                {data.daysActive}
+              </div>
+              <div className="text-white/70 text-sm">days active</div>
             </div>
           </div>
         </motion.div>

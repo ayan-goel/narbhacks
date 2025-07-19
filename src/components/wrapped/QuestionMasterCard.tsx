@@ -118,16 +118,9 @@ export default function QuestionMasterCard({ data, year, index }: QuestionMaster
 
       {/* Question Types */}
       <div className="space-y-4">
-        <motion.h3 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="text-white font-bold text-center"
-        >
-          Your Question Types
-        </motion.h3>
+        {/* Removed header per design update */}
         
-        <div className="space-y-2">
+        <div className="space-y-2 mt-4">
           {questionTypeData.slice(0, 4).map((item, idx) => (
             <motion.div
               key={item.type}

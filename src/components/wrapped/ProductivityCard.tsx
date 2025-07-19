@@ -120,7 +120,7 @@ export default function ProductivityCard({ data, year, index }: ProductivityCard
             <span className="text-2xl font-bold text-white">{data.focusScore}/100</span>
           </div>
           
-          <div className="w-full bg-white/20 rounded-full h-3">
+          <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
             <div 
               className="h-3 bg-gradient-to-r from-green-300 to-emerald-300 rounded-full transition-all duration-1000"
               style={{ width: `${data.focusScore}%` }}

@@ -47,13 +47,8 @@ export default function WrappedCard({
     <motion.div
       initial={{ opacity: 0, y: 100, scale: 0.8 }}
       animate={controls}
-      whileHover={{ 
-        scale: 1.02,
-        transition: { duration: 0.3 }
-      }}
-      whileTap={{ scale: 0.98 }}
       className={`
-        w-full max-w-md mx-auto aspect-[9/16] rounded-3xl shadow-2xl overflow-hidden
+        w-full max-w-lg mx-auto max-h-[85vh] aspect-[9/16] rounded-3xl shadow-2xl overflow-hidden
         relative border border-white/10 backdrop-blur-xl
         ${className}
       `}
@@ -79,7 +74,7 @@ export default function WrappedCard({
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10" />
       
       {/* Content */}
-      <div className="relative h-full p-8 flex flex-col justify-between z-10">
+      <div className="relative h-full p-8 flex flex-col justify-between z-10 overflow-y-auto scrollbar-none">
         {children}
       </div>
 

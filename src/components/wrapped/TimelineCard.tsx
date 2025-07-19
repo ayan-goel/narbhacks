@@ -23,7 +23,8 @@ export default function TimelineCard({ data, year, index }: TimelineCardProps) {
     return months[month - 1] || "Unknown";
   };
 
-  const getTimeOfDayEmoji = (timeOfDay: string) => {
+  const getTimeOfDayEmoji = (timeOfDay?: string) => {
+    if (!timeOfDay) return '⏰';
     switch (timeOfDay.toLowerCase()) {
       case 'morning': return '🌅';
       case 'afternoon': return '☀️';
@@ -44,22 +45,24 @@ export default function TimelineCard({ data, year, index }: TimelineCardProps) {
   const timeEmoji = getTimeOfDayEmoji(data.favoriteTimeOfDay);
 
   // Mock timeline data - in real implementation, this would come from actual data
+  const totalConvs = data.totalConversations ?? 0;
+
   const timelineEvents = [
-    { month: 'Jan', conversations: Math.floor(data.totalConversations * 0.08) },
-    { month: 'Feb', conversations: Math.floor(data.totalConversations * 0.07) },
-    { month: 'Mar', conversations: Math.floor(data.totalConversations * 0.09) },
-    { month: 'Apr', conversations: Math.floor(data.totalConversations * 0.08) },
-    { month: 'May', conversations: Math.floor(data.totalConversations * 0.11) },
-    { month: 'Jun', conversations: Math.floor(data.totalConversations * 0.09) },
-    { month: 'Jul', conversations: Math.floor(data.totalConversations * 0.07) },
-    { month: 'Aug', conversations: Math.floor(data.totalConversations * 0.08) },
-    { month: 'Sep', conversations: Math.floor(data.totalConversations * 0.10) },
-    { month: 'Oct', conversations: Math.floor(data.totalConversations * 0.09) },
-    { month: 'Nov', conversations: Math.floor(data.totalConversations * 0.07) },
-    { month: 'Dec', conversations: Math.floor(data.totalConversations * 0.07) },
+    { month: 'Jan', conversations: Math.floor(totalConvs * 0.08) },
+    { month: 'Feb', conversations: Math.floor(totalConvs * 0.07) },
+    { month: 'Mar', conversations: Math.floor(totalConvs * 0.09) },
+    { month: 'Apr', conversations: Math.floor(totalConvs * 0.08) },
+    { month: 'May', conversations: Math.floor(totalConvs * 0.11) },
+    { month: 'Jun', conversations: Math.floor(totalConvs * 0.09) },
+    { month: 'Jul', conversations: Math.floor(totalConvs * 0.07) },
+    { month: 'Aug', conversations: Math.floor(totalConvs * 0.08) },
+    { month: 'Sep', conversations: Math.floor(totalConvs * 0.10) },
+    { month: 'Oct', conversations: Math.floor(totalConvs * 0.09) },
+    { month: 'Nov', conversations: Math.floor(totalConvs * 0.07) },
+    { month: 'Dec', conversations: Math.floor(totalConvs * 0.07) },
   ];
 
-  const maxConversations = Math.max(...timelineEvents.map(e => e.conversations));
+  const maxConversations = Math.max(1, ...timelineEvents.map(e => e.conversations));
 
   return (
     <WrappedCard backgroundColor="#8B5CF6" index={index}>
@@ -94,7 +97,7 @@ export default function TimelineCard({ data, year, index }: TimelineCardProps) {
               <span className="font-semibold text-white">Golden Hour</span>
             </div>
             <div className="text-xl font-bold text-white capitalize">
-              {data.favoriteTimeOfDay}
+              {data.favoriteTimeOfDay || 'Unknown'}
             </div>
             <div className="text-white/70 text-sm">
               Your preferred time
@@ -104,32 +107,30 @@ export default function TimelineCard({ data, year, index }: TimelineCardProps) {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-white text-center">
+        <h3 className="text-lg font-semibold text-white text-center mt-4">
           Monthly Activity
         </h3>
         
         <div className="space-y-2">
           {timelineEvents.map((event, idx) => {
-            const isActive = idx + 1 === data.mostActiveMonth;
             const height = maxConversations > 0 ? (event.conversations / maxConversations) * 40 : 10;
+            const opacity = maxConversations > 0 ? 0.3 + (event.conversations / maxConversations) * 0.7 : 0.3;
             
             return (
               <div key={event.month} className="flex items-end space-x-2">
                 <div className="w-8 text-xs text-white/70 text-center">
                   {event.month}
                 </div>
-                <div className="flex-1 flex items-end">
-                  <div
-                    className={`transition-all duration-300 rounded-t ${
-                      isActive 
-                        ? 'bg-white' 
-                        : 'bg-white/30'
-                    }`}
-                    style={{ height: `${Math.max(height, 4)}px`, width: '100%' }}
-                  />
+                <div className="flex-1">
+                  <div className="w-full bg-white/20 h-3 rounded-full overflow-hidden">
+                    <div
+                      className="h-3 bg-white rounded-full transition-all duration-500"
+                      style={{ width: `${Math.round((event.conversations / maxConversations) * 100)}%` }}
+                    />
+                  </div>
                 </div>
                 <div className="w-8 text-xs text-white/70 text-right">
-                  {event.conversations}
+                  {isNaN(event.conversations) ? 0 : event.conversations}
                 </div>
               </div>
             );

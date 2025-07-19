@@ -187,7 +187,6 @@ export default function WrappedPage({ params }: WrappedPageProps) {
       case 'productivity_patterns':
         return <ProductivityCard {...cardProps} />;
       case 'learning_journey':
-      case 'growth_story':
       case 'future_predictions':
       case 'community_insights':
       case 'unique_moments':
@@ -265,29 +264,13 @@ export default function WrappedPage({ params }: WrappedPageProps) {
         </button>
 
         {/* Card Content */}
-        <div className="w-full max-w-md mx-auto px-4">
+        <div className="w-full max-w-lg mx-auto px-4">
           {renderCard()}
-        </div>
-
-        {/* Card Indicators */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 max-w-xs overflow-x-auto">
-          {wrappedCards.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setCurrentCard(index);
-                setIsAutoPlaying(false);
-              }}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentCard ? 'bg-white w-6' : 'bg-white/30'
-              }`}
-            />
-          ))}
         </div>
 
         {/* Card Counter */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white/80 text-sm backdrop-blur-sm bg-black/20 px-3 py-1 rounded-full">
-          {currentCard + 1} of {wrappedCards.length}
+          {currentCard + 1} / {wrappedCards.length}
         </div>
       </div>
     </WrappedLayout>

@@ -3,7 +3,7 @@
 import WrappedCard from "./WrappedCard";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Hash, MessageSquare, Type, Calendar, Clock, Zap } from "lucide-react";
+import { Hash, MessageSquare, Type, Calendar, Clock, Zap, BookOpen, Sparkles } from "lucide-react";
 
 interface NumbersCardProps {
   data: {
@@ -13,6 +13,11 @@ interface NumbersCardProps {
     totalTokens: number;
     averageLength: number;
     daysActive: number;
+    avgWordsPerMessage: number;
+    uniqueTopics: number;
+    peakDailyMessages: number;
+    averageDailyConversations: number;
+    // longestConv and shortestConv not passed currently but we can compute outside; skip.
   };
   year: number;
   index?: number;
@@ -102,6 +107,35 @@ export default function NumbersCard({ data, year, index }: NumbersCardProps) {
       delay: 1.2,
       suffix: " msgs",
     },
+    {
+      icon: BookOpen,
+      label: "Avg Words",
+      value: data.avgWordsPerMessage,
+      color: "from-teal-400 to-teal-600",
+      delay: 1.4,
+      suffix: " words",
+    },
+    {
+      icon: Sparkles,
+      label: "Topics",
+      value: data.uniqueTopics,
+      color: "from-indigo-400 to-fuchsia-600",
+      delay: 1.6,
+    },
+    {
+      icon: MessageSquare,
+      label: "Peak Daily Msgs",
+      value: data.peakDailyMessages,
+      color: "from-lime-400 to-emerald-600",
+      delay: 1.8,
+    },
+    {
+      icon: Calendar,
+      label: "Avg Daily Convos",
+      value: data.averageDailyConversations,
+      color: "from-sky-400 to-blue-600",
+      delay: 2.0,
+    },
   ];
 
   return (
@@ -186,7 +220,7 @@ export default function NumbersCard({ data, year, index }: NumbersCardProps) {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.5 }}
-        className="text-center"
+        className="text-center mt-6"
       >
         <div className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 backdrop-blur-sm rounded-2xl p-4">
           <div className="text-white/90 text-sm mb-1">
