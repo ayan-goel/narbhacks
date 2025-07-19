@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import FileUpload from "@/components/upload/FileUpload";
@@ -23,7 +23,27 @@ interface ParsedData {
   };
   topTopics: string[];
   estimatedProcessingTime: string;
-  conversationsData: any[];
+  year: number;
+  conversationsData: Array<{
+    conversationId: string;
+    title: string;
+    createTime: number;
+    updateTime: number;
+    messageCount: number;
+    totalTokens: number;
+    topics: string[];
+    sentiment: string;
+    year: number;
+    month: number;
+    messages: Array<{
+      messageId: string;
+      role: string;
+      content: string;
+      createTime: number;
+      tokenCount: number;
+      wordCount: number;
+    }>;
+  }>;
 }
 
 export default function UploadPage() {
@@ -37,7 +57,52 @@ export default function UploadPage() {
 
   const createUser = useMutation(api.users.createUser);
   const uploadConversations = useMutation(api.conversations.uploadConversations);
-  const generateStats = useMutation(api.analytics.generateUserStats);
+  const uploadMessages = useMutation(api.messages.uploadMessages);
+  const generateStats = useMutation(api.analyticsChunked.startStatsGeneration);
+  const statsStatus = useQuery(
+    api.analyticsChunked.getStatsGenerationStatus,
+    user?.id && (uploadState === "processing" || uploadState === "success")
+      ? {
+          userId: user.id,
+          year: parsedData?.year ?? new Date().getFullYear(),
+        }
+      : "skip"
+  );
+  const generateWrapped = useMutation(api.wrapped.generateWrappedCards);
+
+  // When stats generation completes, trigger wrapped generation (if needed) and finalize flow
+  useEffect(() => {
+    const finalizeUpload = async () => {
+      if (
+        user &&
+        uploadState === "processing" &&
+        statsStatus?.status === "complete"
+      ) {
+        try {
+          // Attempt to generate wrapped cards (may have already been generated server-side)
+          await generateWrapped({
+            userId: user.id,
+            year: parsedData?.year ?? new Date().getFullYear(),
+          });
+        } catch (e) {
+          // Ignore errors if wrapped already generated
+          console.warn("generateWrapped returned an error (likely already generated). Continuing.");
+        }
+
+        setUploadResults({
+          conversationsProcessed: parsedData!.totalConversations,
+          messagesProcessed: parsedData!.totalMessages,
+          topicsExtracted: parsedData!.topTopics.length,
+          processingTime: parsedData!.estimatedProcessingTime,
+        });
+
+        setProgress(100);
+        setUploadState("success");
+      }
+    };
+
+    finalizeUpload();
+  }, [statsStatus, uploadState, user, generateWrapped, parsedData]);
 
   const parseConversationsFile = async (file: File): Promise<ParsedData> => {
     return new Promise((resolve, reject) => {
@@ -93,7 +158,7 @@ export default function UploadPage() {
           // Extract basic statistics
           const totalConversations = conversations.length;
           let totalMessages = 0;
-          const topics: Set<string> = new Set();
+          const topicCounts: Record<string, number> = {}; // Change to count frequency
           let earliestDate = new Date();
           let latestDate = new Date(0);
 
@@ -104,79 +169,91 @@ export default function UploadPage() {
             if (conv.mapping && typeof conv.mapping === 'object') {
               // Standard ChatGPT format
               messages = Object.values(conv.mapping)
-                .filter((node: any) => node.message?.content?.parts?.[0])
-                                  .map((node: any) => {
-                    const contentPart = node.message?.content?.parts?.[0];
-                    const content = typeof contentPart === 'string' ? contentPart : 
-                                   typeof contentPart === 'object' && contentPart?.text ? contentPart.text :
-                                   JSON.stringify(contentPart || '');
-                    
-                    return {
-                      messageId: node.id || `msg_${index}_${Math.random()}`,
-                      role: node.message?.author?.role || 'unknown',
-                      content,
-                      createTime: (node.message?.create_time ? node.message.create_time * 1000 : Date.now()),
-                      tokenCount: Math.ceil((content?.length || 0) / 4),
-                      wordCount: typeof content === 'string' ? content.split(' ').length : 0,
-                    };
-                  });
+                .filter((node: any) => {
+                  // Filter out nodes without messages, system messages, or empty content
+                  if (!node.message) return false;
+                  if (node.message.author?.role === 'system') return false;
+                  if (!node.message.content?.parts?.[0]) return false;
+                  if (node.message.content.parts[0] === '') return false;
+                  if (node.message.content.content_type === 'user_editable_context') return false;
+                  return true;
+                })
+                .map((node: any) => {
+                  const contentPart = node.message.content.parts[0];
+                  const content = typeof contentPart === 'string' ? contentPart : 
+                                 typeof contentPart === 'object' && contentPart?.text ? contentPart.text :
+                                 JSON.stringify(contentPart || '');
+                  
+                  return {
+                    messageId: node.id || `msg_${index}_${Math.random()}`,
+                    role: node.message.author?.role || 'unknown',
+                    content,
+                    createTime: (node.message.create_time ? node.message.create_time * 1000 : Date.now()),
+                    tokenCount: Math.ceil((content?.length || 0) / 4),
+                    wordCount: typeof content === 'string' ? content.split(' ').length : 0,
+                  };
+                });
             } else if (conv.messages && Array.isArray(conv.messages)) {
               // Alternative format
-                             messages = conv.messages.map((msg: any, msgIndex: number) => {
-                 const content = msg.content || msg.text || '';
-                 return {
-                   messageId: msg.id || `msg_${index}_${msgIndex}`,
-                   role: msg.role || msg.author?.role || 'unknown',
-                   content: typeof content === 'string' ? content : JSON.stringify(content),
-                   createTime: msg.timestamp ? new Date(msg.timestamp).getTime() : Date.now(),
-                   tokenCount: Math.ceil((typeof content === 'string' ? content.length : JSON.stringify(content).length) / 4),
-                   wordCount: typeof content === 'string' ? content.split(' ').length : 0,
-                 };
-               });
+              messages = conv.messages.map((msg: any, msgIndex: number) => {
+                const content = msg.content || msg.text || '';
+                return {
+                  messageId: msg.id || `msg_${index}_${msgIndex}`,
+                  role: msg.role || msg.author?.role || 'unknown',
+                  content: typeof content === 'string' ? content : JSON.stringify(content),
+                  createTime: msg.timestamp ? new Date(msg.timestamp).getTime() : Date.now(),
+                  tokenCount: Math.ceil((typeof content === 'string' ? content.length : JSON.stringify(content).length) / 4),
+                  wordCount: typeof content === 'string' ? content.split(' ').length : 0,
+                };
+              });
             }
 
             totalMessages += messages.length;
 
-            // Handle different date formats
-            let createTime = Date.now();
-            if (conv.create_time) {
-              createTime = typeof conv.create_time === 'number' ? conv.create_time * 1000 : new Date(conv.create_time).getTime();
-            } else if (conv.created_at) {
-              createTime = new Date(conv.created_at).getTime();
-            } else if (conv.timestamp) {
-              createTime = new Date(conv.timestamp).getTime();
-            }
-
-            const updateTime = conv.update_time ? conv.update_time * 1000 : 
-                              conv.updated_at ? new Date(conv.updated_at).getTime() : createTime;
+            // Handle ChatGPT timestamp format (seconds or milliseconds)
+            const rawCreate = conv.create_time ?? Date.now();
+            const createTime = rawCreate > 1e12 ? rawCreate : rawCreate * 1000;
+            const rawUpdate = conv.update_time ?? rawCreate;
+            const updateTime = rawUpdate > 1e12 ? rawUpdate : rawUpdate * 1000;
 
             const date = new Date(createTime);
             
             if (date < earliestDate) earliestDate = date;
             if (date > latestDate) latestDate = date;
 
-            // Extract topics from title (simplified)
-            const title = conv.title || conv.name || "Untitled Conversation";
-            const titleWords = title.toLowerCase().split(' ') || [];
+            // Extract topics from title and count frequency
+            const title = conv.title || "Untitled Conversation";
+            const titleWords = title.toLowerCase().split(' ').filter((word: string) => word.length > 3);
             titleWords.forEach((word: string) => {
-              if (word.length > 3) topics.add(word);
+              topicCounts[word] = (topicCounts[word] || 0) + 1;
             });
 
             return {
-              conversationId: conv.conversation_id || conv.id || `conv_${index}`,
+              conversationId: conv.conversation_id || `conv_${index}`,
               title,
               createTime,
               updateTime,
               messageCount: messages.length,
               totalTokens: messages.reduce((sum: number, msg: any) => sum + (msg.tokenCount || 0), 0),
-              topics: titleWords.filter((word: string) => word.length > 3).slice(0, 3),
+              topics: titleWords.slice(0, 3), // Keep first 3 for individual conversation
               sentiment: "neutral", // Will be analyzed later
               year: date.getFullYear(),
               month: date.getMonth() + 1,
+              messages, // Include the processed messages
             };
           });
 
-          const estimatedMinutes = Math.ceil(totalConversations / 100);
+          // Get top 10 most frequent topics
+          const topTopics = Object.entries(topicCounts)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 10)
+            .map(([topic]) => topic);
+
+          const estimatedMinutes = Math.max(1, Math.ceil(totalConversations / 500) * 2); // Doubled estimate for more realistic duration
+          
+          console.log(`Parsed ${totalConversations} conversations with ${totalMessages} total messages`);
+          console.log(`Date range: ${earliestDate.toLocaleDateString()} to ${latestDate.toLocaleDateString()}`);
+          console.log(`Top topics: ${topTopics.slice(0, 5).join(', ')}`);
           
           resolve({
             totalConversations,
@@ -185,8 +262,9 @@ export default function UploadPage() {
               start: earliestDate.toLocaleDateString(),
               end: latestDate.toLocaleDateString(),
             },
-            topTopics: Array.from(topics).slice(0, 10),
+            topTopics,
             estimatedProcessingTime: `${estimatedMinutes} minute${estimatedMinutes > 1 ? 's' : ''}`,
+            year: latestDate.getFullYear(),
             conversationsData: processedConversations,
           });
         } catch (err) {
@@ -221,6 +299,8 @@ export default function UploadPage() {
   const handleConfirmUpload = async () => {
     if (!user || !parsedData) return;
 
+    let targetYear = parsedData.year;
+
     setUploadState('uploading');
     setProgress(30);
 
@@ -236,29 +316,55 @@ export default function UploadPage() {
       setUploadState('processing');
       
       // Upload conversations
+      console.log(`Uploading ${parsedData.conversationsData.length} conversations...`);
+      
+      // Remove messages field from conversations data since it's stored separately
+      const conversationsWithoutMessages = parsedData.conversationsData.map(conv => ({
+        conversationId: conv.conversationId,
+        title: conv.title,
+        createTime: conv.createTime,
+        updateTime: conv.updateTime,
+        messageCount: conv.messageCount,
+        totalTokens: conv.totalTokens,
+        topics: conv.topics,
+        sentiment: conv.sentiment,
+        year: conv.year,
+        month: conv.month,
+      }));
+      
       await uploadConversations({
         userId: user.id,
-        conversationsData: parsedData.conversationsData,
+        conversationsData: conversationsWithoutMessages,
       });
       setProgress(70);
 
-      // Generate statistics
-      const currentYear = new Date().getFullYear();
+      // Upload messages
+      console.log(`Uploading messages for ${parsedData.conversationsData.length} conversations...`);
+      for (const conv of parsedData.conversationsData) {
+        if (conv.messages && conv.messages.length > 0) {
+          console.log(`Uploading ${conv.messages.length} messages for conversation: ${conv.title}`);
+          await uploadMessages({
+            conversationId: conv.conversationId,
+            userId: user.id,
+            messagesData: conv.messages,
+          });
+        }
+      }
+      setProgress(80);
+
+      // Start statistics generation (runs asynchronously in the backend)
+      console.log('Starting statistics generation...');
       await generateStats({
         userId: user.id,
-        year: currentYear,
+        year: targetYear,
       });
-      setProgress(90);
+      console.log('Statistics job started successfully!');
+      setProgress(85);
 
-      setUploadResults({
-        conversationsProcessed: parsedData.totalConversations,
-        messagesProcessed: parsedData.totalMessages,
-        topicsExtracted: parsedData.topTopics.length,
-        processingTime: parsedData.estimatedProcessingTime,
-      });
-
-      setProgress(100);
-      setUploadState('success');
+      // Wrapped cards will be generated automatically once stats are done.
+      // We will poll for completion via statsStatus below.
+      
+      // Leave the rest of the completion logic to the statsStatus watcher.
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
       setUploadState('error');
@@ -303,20 +409,18 @@ export default function UploadPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Dashboard</span>
-          </Link>
-          
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Upload Your ChatGPT Data
+      <div className="max-w-4xl mx-auto space-y-8 min-h-screen flex flex-col justify-start pt-20">
+        {/* Welcome Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-8">
+            <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-indigo-600 bg-clip-text text-transparent">
+              Welcome, {user.firstName || "Explorer"}! 👋
+            </span>
           </h1>
+          
+          <h2 className="text-4xl font-bold text-gray-900 mb-2">
+            Upload Your ChatGPT Data
+          </h2>
           <p className="text-xl text-gray-600">
             Let's analyze your conversations and create your wrapped
           </p>
@@ -339,6 +443,7 @@ export default function UploadPage() {
           <UploadProgress
             progress={progress}
             status={uploadState}
+            estimatedTime={parsedData?.estimatedProcessingTime}
             message={
               uploadState === 'uploading' 
                 ? "Uploading your conversations..." 
@@ -350,7 +455,7 @@ export default function UploadPage() {
         {uploadState === 'success' && uploadResults && (
           <UploadSuccess
             stats={uploadResults}
-            year={new Date().getFullYear()}
+            year={parsedData!.year}
           />
         )}
 

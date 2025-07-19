@@ -9,6 +9,17 @@ export default function ModernHeader() {
   const { user, isSignedIn } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start' 
+      });
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-200/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,24 +39,24 @@ export default function ModernHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              href="#features" 
+            <button 
+              onClick={() => scrollToSection('features')}
               className="text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200"
             >
               Features
-            </Link>
-            <Link 
-              href="#how-it-works" 
+            </button>
+            <button 
+              onClick={() => scrollToSection('how-it-works')}
               className="text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200"
             >
               How it works
-            </Link>
+            </button>
             {isSignedIn ? (
               <Link 
-                href="/dashboard"
+                href="/upload"
                 className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
               >
-                Dashboard
+                Upload
               </Link>
             ) : (
               <Link 
@@ -75,27 +86,25 @@ export default function ModernHeader() {
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-xl border-b border-gray-200/20">
           <div className="px-4 py-6 space-y-4">
-            <Link 
-              href="#features" 
-              className="block text-gray-600 hover:text-gray-900 font-medium py-2"
-              onClick={() => setIsMenuOpen(false)}
+            <button 
+              onClick={() => scrollToSection('features')}
+              className="block text-gray-600 hover:text-gray-900 font-medium py-2 w-full text-left"
             >
               Features
-            </Link>
-            <Link 
-              href="#how-it-works" 
-              className="block text-gray-600 hover:text-gray-900 font-medium py-2"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button 
+              onClick={() => scrollToSection('how-it-works')}
+              className="block text-gray-600 hover:text-gray-900 font-medium py-2 w-full text-left"
             >
               How it works
-            </Link>
+            </button>
             {isSignedIn ? (
               <Link 
-                href="/dashboard"
+                href="/upload"
                 className="block w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-xl font-medium mt-4"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Dashboard
+                Upload
               </Link>
             ) : (
               <Link 

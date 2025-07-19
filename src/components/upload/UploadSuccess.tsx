@@ -51,18 +51,18 @@ export default function UploadSuccess({ stats, year }: UploadSuccessProps) {
       <div className="flex flex-col sm:flex-row gap-3">
         <Link
           href={`/wrapped/${year}`}
-          className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-[#10A37F] text-white rounded-lg hover:bg-[#0d8f72] transition-colors"
+          className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
         >
           <Sparkles className="h-5 w-5" />
           <span>View Your Wrapped</span>
         </Link>
         
         <Link
-          href="/dashboard"
+          href="/upload"
           className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <BarChart3 className="h-5 w-5" />
-          <span>Go to Dashboard</span>
+          <span>Upload More Data</span>
         </Link>
       </div>
 

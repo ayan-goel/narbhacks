@@ -1,20 +1,50 @@
 "use client";
 
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface UploadProgressProps {
   progress: number;
   status: 'idle' | 'uploading' | 'processing' | 'success' | 'error';
   message?: string;
   error?: string;
+  estimatedTime?: string; // Add estimated time prop
 }
 
 export default function UploadProgress({ 
   progress, 
   status, 
   message = "Processing your ChatGPT data...",
-  error 
+  error,
+  estimatedTime = "2 minutes"
 }: UploadProgressProps) {
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+
+  // Initialize countdown when processing starts
+  useEffect(() => {
+    if (status === 'processing' && estimatedTime) {
+      // Parse estimated time (e.g., "2 minutes" -> 120 seconds)
+      const minutes = parseInt(estimatedTime.match(/\d+/)?.[0] || "2");
+      setTimeLeft(minutes * 60); // Use the full estimate since it's already realistic
+    }
+  }, [status, estimatedTime]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (status === 'processing' && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [status, timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const getStatusIcon = () => {
     switch (status) {
       case 'success':
@@ -43,17 +73,6 @@ export default function UploadProgress({
     }
   };
 
-  const getProgressBarColor = () => {
-    switch (status) {
-      case 'success':
-        return 'bg-green-500';
-      case 'error':
-        return 'bg-red-500';
-      default:
-        return 'bg-[#10A37F]';
-    }
-  };
-
   if (status === 'idle') return null;
 
   return (
@@ -74,7 +93,8 @@ export default function UploadProgress({
           </div>
         </div>
 
-        {(status === 'uploading' || status === 'processing') && (
+        {/* Show progress bar for uploading */}
+        {status === 'uploading' && (
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-600">
               <span>Progress</span>
@@ -82,16 +102,24 @@ export default function UploadProgress({
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className={`h-2 rounded-full transition-all duration-300 ${getProgressBarColor()}`}
+                className="h-2 bg-[#10A37F] rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
         )}
 
+        {/* Show countdown timer for processing */}
         {status === 'processing' && (
-          <div className="mt-4 text-xs text-gray-500">
-            <p>This may take a few minutes for large conversation histories...</p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-center bg-gray-50 rounded-lg p-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-800">
+                  {formatTime(timeLeft)}
+                </div>
+                <div className="text-sm text-gray-600">estimated time left</div>
+              </div>
+            </div>
           </div>
         )}
       </div>

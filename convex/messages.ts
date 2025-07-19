@@ -17,18 +17,19 @@ export const uploadMessages = mutation({
   handler: async (ctx, args) => {
     const insertedIds = [];
     
-    for (const message of args.messagesData) {
+    for (const msg of args.messagesData) {
       // Check if message already exists
       const existing = await ctx.db
         .query("messages")
-        .withIndex("by_message_id", (q) => q.eq("messageId", message.messageId))
+        .withIndex("by_message_id", (q) => q.eq("messageId", msg.messageId))
         .first();
 
       if (!existing) {
         const id = await ctx.db.insert("messages", {
           conversationId: args.conversationId,
           userId: args.userId,
-          ...message,
+          ...msg,
+          year: new Date(msg.createTime).getFullYear(),
         });
         insertedIds.push(id);
       }

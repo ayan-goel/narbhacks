@@ -106,26 +106,6 @@ export default function Features() {
             );
           })}
         </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-20">
-          <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-white/20 max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Ready to explore your AI journey?
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Upload your ChatGPT conversations and discover insights you never knew existed.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
-                Get Started Free
-              </button>
-              <button className="text-gray-700 hover:text-gray-900 font-medium">
-                Learn more →
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

@@ -8,7 +8,7 @@ export default function ModernHero() {
   const { isSignedIn } = useUser();
 
   return (
-    <section className="relative pt-32 pb-20 overflow-hidden">
+    <section className="relative min-h-screen flex flex-col justify-center pt-20 pb-20 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 -z-10">
         {/* Gradient orbs */}
@@ -49,13 +49,13 @@ export default function ModernHero() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {isSignedIn ? (
               <Link 
-                href="/dashboard"
+                href="/upload"
                 className="group bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2"
               >
-                <span>Go to Dashboard</span>
+                <span>Go to Upload</span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
             ) : (
@@ -75,71 +75,6 @@ export default function ModernHero() {
                 </Link>
               </>
             )}
-          </div>
-
-          {/* Floating Cards Preview */}
-          <div className="relative max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 perspective-1000">
-              {/* Stats Card */}
-              <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 hover:rotate-1">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                    <BarChart3 className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="font-semibold text-gray-800">Your Stats</span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 text-sm">Conversations</span>
-                    <span className="font-bold text-gray-800">1,247</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 text-sm">Messages</span>
-                    <span className="font-bold text-gray-800">15,623</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 text-sm">Most Active</span>
-                    <span className="font-bold text-gray-800">December</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Topics Card */}
-              <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 hover:-rotate-1 md:translate-y-4">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl flex items-center justify-center">
-                    <Brain className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="font-semibold text-gray-800">Top Topics</span>
-                </div>
-                <div className="space-y-2">
-                  {["Programming", "Writing", "Learning", "Research"].map((topic, i) => (
-                    <div key={topic} className="flex items-center space-x-2">
-                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${
-                        i === 0 ? "from-purple-400 to-pink-500" :
-                        i === 1 ? "from-blue-400 to-cyan-500" :
-                        i === 2 ? "from-green-400 to-emerald-500" :
-                        "from-orange-400 to-red-500"
-                      }`}></div>
-                      <span className="text-sm text-gray-700">{topic}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Insights Card */}
-              <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 hover:rotate-1">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center">
-                    <Sparkles className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="font-semibold text-gray-800">AI Insights</span>
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  "You're most creative in the evening, with 68% of your deep conversations happening after 6 PM."
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -36,9 +36,11 @@ export default defineSchema({
     createTime: v.number(),
     tokenCount: v.number(),
     wordCount: v.number(),
+    year: v.optional(v.number()),
   })
     .index("by_conversation", ["conversationId"])
     .index("by_user", ["userId"])
+    .index("by_user_year", ["userId", "year"])
     .index("by_message_id", ["messageId"]),
 
   userStats: defineTable({
@@ -74,4 +76,20 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_year", ["userId", "year"])
     .index("by_shared", ["isShared"]),
+
+  statsProgress: defineTable({
+    userId: v.string(),
+    year: v.number(),
+    cursor: v.union(v.string(), v.null()),
+    aggregates: v.any(),
+    done: v.boolean(),
+  }).index("by_user_year", ["userId", "year"]),
+
+  wrappedProgress: defineTable({
+    userId: v.string(),
+    cursor: v.optional(v.string()),
+    cardIndex: v.number(),
+    year: v.number(),
+    done: v.boolean(),
+  }).index("by_user_year", ["userId", "year"]),
 });

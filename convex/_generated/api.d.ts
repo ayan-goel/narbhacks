@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as analytics from "../analytics.js";
+import type * as analyticsChunked from "../analyticsChunked.js";
 import type * as conversations from "../conversations.js";
 import type * as messages from "../messages.js";
 import type * as openai from "../openai.js";
@@ -31,6 +32,7 @@ import type * as wrapped from "../wrapped.js";
  */
 declare const fullApi: ApiFromModules<{
   analytics: typeof analytics;
+  analyticsChunked: typeof analyticsChunked;
   conversations: typeof conversations;
   messages: typeof messages;
   openai: typeof openai;

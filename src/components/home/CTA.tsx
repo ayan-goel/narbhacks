@@ -74,10 +74,10 @@ export default function CTA() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             {isSignedIn ? (
               <Link 
-                href="/dashboard"
+                href="/upload"
                 className="group bg-white text-gray-900 px-10 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2"
               >
-                <span>Go to Dashboard</span>
+                <span>Go to Upload</span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
             ) : (

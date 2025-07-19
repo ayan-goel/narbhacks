@@ -3,8 +3,8 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <section className="bg_image">
-      <div className="container py-16 sm:py-36 px-6 sm:px-0">
+    <section className="bg_image min-h-screen flex items-center">
+      <div className="container py-16 sm:py-24 px-6 sm:px-0">
         <div className="flex sm:flex-wrap flex-nowrap justify-between items-center max-h-[690px] h-full">
           <div className="">
             <h2 className="font-montserrat pb-7 sm:pb-[26px] text-black text-[44px] sm:text-[75px] not-italic font-medium leading-[111.3%] tracking-[-1.1px] sm:tracking-[-1.875px]">
